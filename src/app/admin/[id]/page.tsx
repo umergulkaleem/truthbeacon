@@ -1,14 +1,8 @@
-// src/app/admin/[id]/page.tsx
-
 import { supabase } from "@/lib/supabase";
 import AdminReportClient from "./ClientReport";
 import { notFound } from "next/navigation";
 
-interface Props {
-  params: { id: string };
-}
-
-export default async function Page({ params }: Props) {
+export default async function Page({ params }: { params: { id: string } }) {
   const { id } = params;
 
   const { data: report, error } = await supabase
