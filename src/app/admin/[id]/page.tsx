@@ -4,12 +4,11 @@ import { supabase } from "@/lib/supabase";
 import AdminReportClient from "./ClientReport";
 import { notFound } from "next/navigation";
 
-// ✅ DO NOT define custom type — just destructure `params` inline
-export default async function AdminReportPage({
-  params,
-}: {
+interface Props {
   params: { id: string };
-}) {
+}
+
+export default async function Page({ params }: Props) {
   const { id } = params;
 
   const { data: report, error } = await supabase
@@ -19,7 +18,7 @@ export default async function AdminReportPage({
     .single();
 
   if (error || !report) {
-    notFound(); // triggers 404
+    notFound();
   }
 
   return <AdminReportClient report={report} />;
