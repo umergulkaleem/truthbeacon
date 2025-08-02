@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) router.push("/");
-  }, [user]);
+  }, [user, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +81,7 @@ export default function LoginPage() {
         </button>
 
         <p className="mt-5 text-center text-sm text-gray-600">
-          Don't have an account?{" "}
+          Dont have an account?{" "}
           <Link
             href="/signup"
             className="text-blue-600 hover:underline font-medium"

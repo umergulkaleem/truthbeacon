@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-
+import Image from "next/image";
 type Report = {
   id: string;
   title: string;
@@ -68,11 +68,13 @@ export default function AdminReportClient({ report }: { report: Report }) {
         </p>
 
         {report.image_url && (
-          <div className="mt-4">
-            <img
+          <div className="mt-4 w-full max-w-2xl">
+            <Image
               src={report.image_url}
               alt="Report Image"
-              className="max-w-sm rounded shadow"
+              width={400}
+              height={200}
+              className="w-full h-auto rounded shadow object-cover"
             />
           </div>
         )}

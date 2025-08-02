@@ -25,7 +25,7 @@ export default function AdminPage() {
     if (!loading && user?.email !== "demo@abc.com") {
       router.push("/");
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   useEffect(() => {
     if (user?.email === "demo@abc.com") {

@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   experimental: {
-    serverActions: {}, // ✅ fixed structure
+    serverActions: {}, // ✅ correct for your version
   },
 };
 
