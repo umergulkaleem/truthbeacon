@@ -4,11 +4,24 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
+
+type Report = {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  category: string;
+  image_url: string;
+  timestamp: string;
+  upvotes: number;
+};
 
 export default function ReportDetailPage() {
   const { id } = useParams();
   const { user } = useAuth();
-  const [report, setReport] = useState<any>(null);
+
+  const [report, setReport] = useState<Report | null>(null);
   const [hasUpvoted, setHasUpvoted] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +35,9 @@ export default function ReportDetailPage() {
         .eq("id", id)
         .single();
 
-      if (!reportError) setReport(reportData);
+      if (!reportError && reportData) {
+        setReport(reportData);
+      }
 
       if (user) {
         const { data: voteData, error: voteError } = await supabase
@@ -72,11 +87,16 @@ export default function ReportDetailPage() {
         ) : report ? (
           <>
             {report.image_url && (
-              <img
-                src={report.image_url}
-                alt={report.title}
-                className="w-full h-64 object-cover rounded-xl mb-6"
-              />
+              <div className="relative w-full h-64 rounded-xl overflow-hidden mb-6">
+                <Image
+                  src={report.image_url}
+                  alt={report.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 700px"
+                  priority
+                />
+              </div>
             )}
 
             <h1 className="text-3xl font-bold mb-2 text-indigo-800">

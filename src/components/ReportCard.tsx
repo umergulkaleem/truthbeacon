@@ -1,6 +1,13 @@
 import Link from "next/link";
 
-export default function ReportCard({ report }: { report: any }) {
+type Report = {
+  id: string;
+  title: string;
+  category: string;
+  location: string;
+};
+
+export default function ReportCard({ report }: { report: Report }) {
   return (
     <Link
       href={`/report/${report.id}`}

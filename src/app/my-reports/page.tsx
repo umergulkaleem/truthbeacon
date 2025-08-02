@@ -4,10 +4,23 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import Image from "next/image";
+
+// ✅ Define a proper TypeScript type for your report
+type Report = {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  status: string;
+  image_url?: string;
+  timestamp: string;
+  user_id: string;
+};
 
 export default function MyReportsPage() {
   const { user } = useAuth();
-  const [reports, setReports] = useState<any[]>([]);
+  const [reports, setReports] = useState<Report[]>([]); // ✅ No more "any[]"
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -17,7 +30,7 @@ export default function MyReportsPage() {
         .eq("user_id", user?.id)
         .order("timestamp", { ascending: false });
 
-      setReports(data || []);
+      setReports((data as Report[]) || []);
     };
 
     if (user) fetchReports();
@@ -57,11 +70,16 @@ export default function MyReportsPage() {
                   </div>
 
                   {r.image_url && (
-                    <img
-                      src={r.image_url}
-                      alt="Report Image"
-                      className="mt-4 rounded-lg border max-h-64 w-full object-cover"
-                    />
+                    <div className="mt-4 overflow-x-auto">
+                      <Image
+                        src={r.image_url}
+                        alt="Report Image"
+                        width={0}
+                        height={0}
+                        sizes="100vw"
+                        className="w-auto h-auto max-w-full rounded-lg border image-pixelated"
+                      />
+                    </div>
                   )}
                 </li>
               ))}

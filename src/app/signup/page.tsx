@@ -14,22 +14,24 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // ✅ Fix: include `router` as dependency
   useEffect(() => {
     if (user) router.push("/");
-  }, [user]);
+  }, [user, router]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
     });
 
-    if (error) setError(error.message);
-    else {
+    if (error) {
+      setError(error.message);
+    } else {
       alert("Account created! Check your email for confirmation.");
       router.push("/login");
     }

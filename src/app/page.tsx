@@ -2,9 +2,22 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import Image from "next/image";
+
+// Define report type
+type Report = {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  timestamp: string;
+  image_url?: string;
+  upvotes?: number;
+  status: string;
+};
 
 export default function HomePage() {
-  const [reports, setReports] = useState<any[]>([]);
+  const [reports, setReports] = useState<Report[]>([]);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -15,7 +28,7 @@ export default function HomePage() {
         .order("timestamp", { ascending: false });
 
       if (!error && data) {
-        setReports(data);
+        setReports(data as Report[]);
       } else {
         console.error("Error fetching approved reports:", error?.message);
       }
@@ -41,11 +54,14 @@ export default function HomePage() {
               <Link key={report.id} href={`/report/${report.id}`}>
                 <div className="cursor-pointer bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col border border-gray-100">
                   {report.image_url && (
-                    <img
-                      src={report.image_url}
-                      alt={report.title}
-                      className="h-48 w-full object-cover"
-                    />
+                    <div className="relative h-48 w-full">
+                      <Image
+                        src={report.image_url}
+                        alt={report.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                   )}
                   <div className="p-4 flex flex-col gap-1">
                     <h2 className="text-lg font-semibold text-gray-900 line-clamp-1">

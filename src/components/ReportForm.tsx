@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
@@ -14,7 +15,7 @@ export default function ReportForm() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!user || !user.id) {
@@ -30,7 +31,7 @@ export default function ReportForm() {
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `reports/${fileName}`;
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("report-images")
         .upload(filePath, imageFile, {
           cacheControl: "3600",
@@ -87,10 +88,6 @@ export default function ReportForm() {
       onSubmit={handleSubmit}
       className="bg-white p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl shadow-xl max-w-3xl mx-auto w-full space-y-6"
     >
-      {/* <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800 text-center">
-        Submit a New Report
-      </h2> */}
-
       <div className="space-y-4">
         <input
           type="text"

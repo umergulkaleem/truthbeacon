@@ -11,11 +11,12 @@ export default function ProtectedRoute({
   const { user, loading } = useAuth(); // ✅ include loading state
   const router = useRouter();
 
+  // ✅ Fix: Add 'router' to dependencies
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   if (loading) return <p className="p-4">Loading...</p>; // ✅ prevent premature render
   if (!user) return null;

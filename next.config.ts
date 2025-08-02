@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ["icuhoipcqehsbuwjtspu.supabase.co"],
+  },
+  reactStrictMode: true,
+  experimental: {
+    serverActions: {}, // ✅ fixed structure
+  },
 };
 
 export default nextConfig;
