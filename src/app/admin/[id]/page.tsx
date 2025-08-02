@@ -1,11 +1,14 @@
 import { supabase } from "@/lib/supabase";
 import AdminReportClient from "./ClientReport";
+import { notFound } from "next/navigation";
 
-export default async function AdminReportPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+type Props = {
+  params: {
+    id: string;
+  };
+};
+
+export default async function AdminReportPage({ params }: Props) {
   const { id } = params;
 
   const { data: report, error } = await supabase
@@ -15,7 +18,7 @@ export default async function AdminReportPage({
     .single();
 
   if (error || !report) {
-    return <div className="p-4 text-red-500">Report not found.</div>;
+    notFound(); // ✅ Better fallback than inline <div>
   }
 
   return <AdminReportClient report={report} />;
