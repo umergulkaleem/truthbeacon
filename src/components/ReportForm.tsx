@@ -58,14 +58,13 @@ export default function ReportForm() {
       image_url = publicUrlData.publicUrl;
     }
 
-    // ✅ Insert the report with current timestamp
     const { error: insertError } = await supabase.from("reports").insert({
       title,
       description,
       location,
       image_url,
       user_id: user.id,
-      timestamp: new Date().toISOString(), // Add current date-time
+      timestamp: new Date().toISOString(),
     });
 
     if (insertError) {
@@ -86,56 +85,63 @@ export default function ReportForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-lg shadow-md max-w-xl mx-auto space-y-4"
+      className="bg-white p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl shadow-xl max-w-3xl mx-auto w-full space-y-6"
     >
-      <h2 className="text-2xl font-bold">Submit a New Report</h2>
+      {/* <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800 text-center">
+        Submit a New Report
+      </h2> */}
 
-      <input
-        type="text"
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        required
-        className="w-full p-2 border border-gray-300 rounded"
-      />
-
-      <textarea
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        required
-        rows={4}
-        className="w-full p-2 border border-gray-300 rounded"
-      />
-
-      <input
-        type="text"
-        placeholder="Location"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        required
-        className="w-full p-2 border border-gray-300 rounded"
-      />
-
-      <div>
+      <div className="space-y-4">
         <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+          type="text"
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           required
-          className="w-full p-2 border border-gray-300 rounded"
+          className="w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
         />
-        {imageFile && (
-          <p className="text-sm text-gray-500 mt-1">
-            Selected: <span className="font-medium">{imageFile.name}</span>
-          </p>
-        )}
+
+        <textarea
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+          rows={4}
+          className="w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        />
+
+        <input
+          type="text"
+          placeholder="Location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          required
+          className="w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        />
+
+        <div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            required
+            className="w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none"
+          />
+          {imageFile && (
+            <p className="text-sm text-gray-500 mt-2">
+              Selected:{" "}
+              <span className="font-medium text-gray-700">
+                {imageFile.name}
+              </span>
+            </p>
+          )}
+        </div>
       </div>
 
       <button
         type="submit"
         disabled={uploading}
-        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        className="w-full bg-blue-600 hover:bg-blue-700 transition-colors duration-200 text-white font-semibold py-3 rounded-lg shadow-md"
       >
         {uploading ? "Submitting..." : "Submit Report"}
       </button>

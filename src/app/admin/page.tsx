@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext"; // make sure this exists
 
 type Report = {
   id: number;
@@ -13,11 +16,22 @@ type Report = {
 };
 
 export default function AdminPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [reports, setReports] = useState<Report[]>([]);
 
+  // Block unauthorized users
   useEffect(() => {
-    fetchReports();
-  }, []);
+    if (!loading && user?.email !== "demo@abc.com") {
+      router.push("/");
+    }
+  }, [user, loading]);
+
+  useEffect(() => {
+    if (user?.email === "demo@abc.com") {
+      fetchReports();
+    }
+  }, [user]);
 
   const fetchReports = async () => {
     const { data, error } = await supabase
@@ -33,22 +47,8 @@ export default function AdminPage() {
     }
   };
 
-  const handleStatusUpdate = async (
-    id: number,
-    status: "approved" | "rejected"
-  ) => {
-    const { error } = await supabase
-      .from("reports")
-      .update({ status })
-      .eq("id", id);
-
-    if (error) {
-      console.error(`Failed to ${status} report:`, error.message);
-    } else {
-      // Remove from state after update
-      setReports(reports.filter((r) => r.id !== id));
-    }
-  };
+  if (loading) return <div className="p-6">Loading...</div>;
+  if (user?.email !== "demo@abc.com") return null;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -70,9 +70,10 @@ export default function AdminPage() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {reports.map((report) => (
-              <div
+              <Link
                 key={report.id}
-                className="bg-white shadow-md rounded-lg p-6 border border-gray-200"
+                href={`/admin/${report.id}`}
+                className="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg transition"
               >
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">
                   {report.title}
@@ -80,28 +81,13 @@ export default function AdminPage() {
                 <p className="text-gray-600 mb-1">
                   <strong>Location:</strong> {report.location}
                 </p>
-                <p className="text-gray-600 mb-3">
+                <p className="text-gray-600 mb-3 line-clamp-2">
                   <strong>Description:</strong> {report.description}
                 </p>
-                <p className="text-sm text-gray-400 mb-4">
-                  Submitted at: {new Date(report.timestamp).toLocaleString()}
+                <p className="text-sm text-gray-400">
+                  Submitted: {new Date(report.timestamp).toLocaleString()}
                 </p>
-
-                <div className="flex justify-between">
-                  <button
-                    onClick={() => handleStatusUpdate(report.id, "approved")}
-                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => handleStatusUpdate(report.id, "rejected")}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-                  >
-                    Reject
-                  </button>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

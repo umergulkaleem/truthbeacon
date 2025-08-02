@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-
 import { useAuth } from "@/context/AuthContext";
 
 export default function ReportDetailPage() {
@@ -17,20 +16,14 @@ export default function ReportDetailPage() {
     const fetchData = async () => {
       if (!id) return;
 
-      // Get report
       const { data: reportData, error: reportError } = await supabase
         .from("reports")
         .select("*")
         .eq("id", id)
         .single();
 
-      if (reportError) {
-        console.error("Error fetching report:", reportError.message);
-      } else {
-        setReport(reportData);
-      }
+      if (!reportError) setReport(reportData);
 
-      // Check if user has upvoted
       if (user) {
         const { data: voteData, error: voteError } = await supabase
           .from("report_upvotes")
@@ -40,7 +33,7 @@ export default function ReportDetailPage() {
           .single();
 
         if (voteData) setHasUpvoted(true);
-        else if (voteError?.code === "PGRST116") setHasUpvoted(false); // not found
+        else if (voteError?.code === "PGRST116") setHasUpvoted(false);
       }
 
       setLoading(false);
@@ -59,54 +52,49 @@ export default function ReportDetailPage() {
       },
     ]);
 
-    if (error) {
-      console.error("Upvote failed:", error.message);
-      return;
-    }
+    if (error) return console.error("Upvote failed:", error.message);
 
     setHasUpvoted(true);
 
-    // Optionally re-fetch report to get accurate upvote count
-    const { data: upvotes } = await supabase
+    const { count } = await supabase
       .from("report_upvotes")
       .select("*", { count: "exact", head: true })
       .eq("report_id", report.id);
 
-    setReport({ ...report, upvotes: upvotes?.length ?? 0 });
+    setReport({ ...report, upvotes: count ?? 0 });
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 to-indigo-100">
-      <div className="flex-1 p-4 sm:p-6 max-w-3xl mx-auto text-gray-800">
+    <main className="min-h-screen bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center py-10 px-4">
+      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-6 md:p-8">
         {loading ? (
-          <div className="text-center text-gray-600 text-lg">
-            Loading report...
-          </div>
+          <p className="text-center text-gray-600 text-lg">Loading report...</p>
         ) : report ? (
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+          <>
             {report.image_url && (
               <img
                 src={report.image_url}
                 alt={report.title}
-                className="w-full h-64 object-cover rounded-xl mb-4"
+                className="w-full h-64 object-cover rounded-xl mb-6"
               />
             )}
 
-            <h1 className="text-3xl font-bold mb-2">{report.title}</h1>
+            <h1 className="text-3xl font-bold mb-2 text-indigo-800">
+              {report.title}
+            </h1>
 
-            <p className="text-sm text-gray-500 mb-1">
+            <div className="text-sm text-gray-500 mb-2">
               📍 {report.location} · 🏷️ {report.category}
-            </p>
-
-            <p className="text-xs text-gray-400 mb-4">
+            </div>
+            <div className="text-xs text-gray-400 mb-4">
               🕒 {new Date(report.timestamp).toLocaleString()}
-            </p>
+            </div>
 
-            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed mb-4">
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap mb-6">
               {report.description}
             </p>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between">
               <p className="text-sm text-green-600 font-medium">
                 👍 {report.upvotes ?? 0} upvotes
               </p>
@@ -117,7 +105,7 @@ export default function ReportDetailPage() {
                 ) : (
                   <button
                     onClick={handleUpvote}
-                    className="px-4 py-1 rounded-xl text-sm font-semibold border bg-green-100 text-green-700 hover:bg-green-200"
+                    className="px-4 py-1 rounded-xl text-sm font-semibold border border-green-300 bg-green-100 text-green-700 hover:bg-green-200 transition"
                   >
                     Upvote
                   </button>
@@ -126,11 +114,9 @@ export default function ReportDetailPage() {
                 <span className="text-sm text-gray-400">Login to upvote</span>
               )}
             </div>
-          </div>
+          </>
         ) : (
-          <div className="text-center text-gray-600 text-lg">
-            Report not found.
-          </div>
+          <p className="text-center text-gray-600 text-lg">Report not found.</p>
         )}
       </div>
     </main>

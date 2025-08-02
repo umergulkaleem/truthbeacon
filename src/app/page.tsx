@@ -25,21 +25,21 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-gray-300">
-      <div className="flex-1 p-4 sm:p-6 max-w-6xl mx-auto w-full">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">
-          🛡️ Verified Reports
+    <main className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-gray-200 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto w-full">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-10 text-center text-gray-800">
+          Verified Reports
         </h1>
 
         {reports.length === 0 ? (
-          <p className="text-gray-600 text-center">
+          <div className="text-center text-gray-600 text-lg mt-20">
             No approved reports available.
-          </p>
+          </div>
         ) : (
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {reports.map((report) => (
               <Link key={report.id} href={`/report/${report.id}`}>
-                <div className="cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden flex flex-col">
+                <div className="cursor-pointer bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col border border-gray-100">
                   {report.image_url && (
                     <img
                       src={report.image_url}
