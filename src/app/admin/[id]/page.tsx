@@ -1,8 +1,14 @@
+// src/app/admin/[id]/page.tsx
 import { supabase } from "@/lib/supabase";
 import AdminReportClient from "./ClientReport";
 import { notFound } from "next/navigation";
 
-export default async function Page({ params }: { params: { id: string } }) {
+// This is the correct type to match Next.js app route behavior
+type PageProps = {
+  params: { id: string };
+};
+
+export default async function Page({ params }: PageProps) {
   const { id } = params;
 
   const { data: report, error } = await supabase
