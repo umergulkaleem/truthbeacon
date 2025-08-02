@@ -2,8 +2,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 export default function HomePage() {
   const [reports, setReports] = useState<any[]>([]);
@@ -28,7 +26,6 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-gray-300">
-      <Header />
       <div className="flex-1 p-4 sm:p-6 max-w-6xl mx-auto w-full">
         <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">
           🛡️ Verified Reports
@@ -73,7 +70,6 @@ export default function HomePage() {
           </div>
         )}
       </div>
-      <Footer />
     </main>
   );
 }

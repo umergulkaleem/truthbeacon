@@ -2,9 +2,11 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ReportForm() {
   const router = useRouter();
+  const { user } = useAuth();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -14,19 +16,26 @@ export default function ReportForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUploading(true);
 
+    if (!user || !user.id) {
+      alert("You must be logged in to submit a report.");
+      return;
+    }
+
+    setUploading(true);
     let image_url = "";
 
-    // Upload image to Supabase Storage
     if (imageFile) {
       const fileExt = imageFile.name.split(".").pop();
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `reports/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from("report-images")
-        .upload(filePath, imageFile);
+        .upload(filePath, imageFile, {
+          cacheControl: "3600",
+          upsert: false,
+        });
 
       if (uploadError) {
         console.error("Image upload failed:", uploadError.message);
@@ -39,24 +48,28 @@ export default function ReportForm() {
         .from("report-images")
         .getPublicUrl(filePath);
 
-      image_url = publicUrlData?.publicUrl || "";
+      if (!publicUrlData?.publicUrl) {
+        console.error("Could not get public URL.");
+        alert("Could not get public image URL.");
+        setUploading(false);
+        return;
+      }
+
+      image_url = publicUrlData.publicUrl;
     }
 
-    // Insert report into the database
-    const { error } = await supabase.from("reports").insert([
-      {
-        title,
-        description,
-        location,
-        image_url,
-        timestamp: new Date().toISOString(),
-        status: "pending",
-        upvotes: 0,
-      },
-    ]);
+    // ✅ Insert the report with current timestamp
+    const { error: insertError } = await supabase.from("reports").insert({
+      title,
+      description,
+      location,
+      image_url,
+      user_id: user.id,
+      timestamp: new Date().toISOString(), // Add current date-time
+    });
 
-    if (error) {
-      console.error("Failed to submit report:", error.message);
+    if (insertError) {
+      console.error("Failed to submit report:", insertError.message);
       alert("Failed to submit report.");
     } else {
       alert("Report submitted successfully and is pending approval.");
@@ -64,7 +77,7 @@ export default function ReportForm() {
       setDescription("");
       setLocation("");
       setImageFile(null);
-      router.push("/"); // or your desired redirect
+      router.push("/");
     }
 
     setUploading(false);
@@ -104,13 +117,20 @@ export default function ReportForm() {
         className="w-full p-2 border border-gray-300 rounded"
       />
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-        required
-        className="w-full p-2 border border-gray-300 rounded"
-      />
+      <div>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+          required
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+        {imageFile && (
+          <p className="text-sm text-gray-500 mt-1">
+            Selected: <span className="font-medium">{imageFile.name}</span>
+          </p>
+        )}
+      </div>
 
       <button
         type="submit"

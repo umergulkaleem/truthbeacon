@@ -1,66 +1,60 @@
 "use client";
+
 import Link from "next/link";
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
-const Header = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname();
-
-  const navItems = [
-    { name: "Home", href: "/" },
-    { name: "Submit Report", href: "/submit" },
-    { name: "Admin", href: "/admin" },
-  ];
+export default function Header() {
+  const { user, loading, signOut } = useAuth();
 
   return (
-    <header className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md">
-      <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
-        <h1 className="text-xl font-bold">
-          <Link href="/">TruthBeacon</Link>
-        </h1>
-        <nav className="hidden md:flex space-x-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`hover:underline ${
-                pathname === item.href ? "font-semibold underline" : ""
-              }`}
-            >
-              {item.name}
-            </Link>
-          ))}
+    <header className="w-full bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center">
+      <Link href="/" className="text-2xl font-bold text-blue-600">
+        TruthBeacon
+      </Link>
+
+      {!loading && (
+        <nav className="flex gap-4 items-center">
+          <Link href="/" className="text-gray-700 hover:text-black">
+            Home
+          </Link>
+
+          <Link href="/submit" className="text-gray-700 hover:text-black">
+            Submit Report
+          </Link>
+
+          {user ? (
+            <>
+              <Link
+                href="/my-reports"
+                className="text-gray-700 hover:text-black"
+              >
+                My Reports
+              </Link>
+              <button
+                onClick={signOut}
+                className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
+              >
+                Login
+              </Link>
+              {/* <Link
+                href="/signup"
+                className="text-gray-700 hover:text-black underline"
+              >
+                Sign Up
+              </Link> */}
+            </>
+          )}
         </nav>
-
-        {/* Mobile menu button */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-white focus:outline-none"
-        >
-          ☰
-        </button>
-      </div>
-
-      {/* Mobile menu */}
-      {isOpen && (
-        <div className="md:hidden px-4 pb-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setIsOpen(false)}
-              className={`block py-2 ${
-                pathname === item.href ? "font-semibold underline" : ""
-              }`}
-            >
-              {item.name}
-            </Link>
-          ))}
-        </div>
       )}
     </header>
   );
-};
-
-export default Header;
+}

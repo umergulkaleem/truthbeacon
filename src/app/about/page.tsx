@@ -1,11 +1,8 @@
 "use client";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 export default function AboutPage() {
   return (
     <main className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 to-green-100">
-      <Header />
       <div className="flex-1 p-4 sm:p-6 max-w-4xl mx-auto w-full text-gray-800">
         <h1 className="text-3xl font-bold mb-4">About TruthBeacon</h1>
         <p className="mb-4">
@@ -24,7 +21,6 @@ export default function AboutPage() {
           collaborate and build lasting change.
         </p>
       </div>
-      <Footer />
     </main>
   );
 }
